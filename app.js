@@ -24,15 +24,63 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
-  // routes
+// routes
 
 app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.get("/profile", IsloggedIn ,(req,res)=>{
-  res.send("welcome back in your profile")
-} )
+app.get("/profile", IsloggedIn, async (req, res) => {
+  const user = await UserModel.findOne({ email: req.user.email }).populate(
+    "post"
+  );
+  res.render("profile", { user });
+});
+
+app.get("/like/:id", IsloggedIn, async (req, res) => {
+  try {
+    // Find the post by ID
+    const post = await postModel.findById(req.params.id).populate("user");
+
+    if (!post) {
+      // If post not found, send a 404 response
+      return res.status(404).send("Post not found");
+    }
+
+    // Check if user already liked the post
+    const userIndex = post.likes.indexOf(req.user.userid);
+
+    if (userIndex === -1) {
+      // If user has not liked the post, add the like
+      post.likes.push(req.user.userid);
+    } else {
+      // If user has already liked the post, remove the like
+      post.likes.splice(userIndex, 1);
+    }
+
+    // Save the updated post
+    await post.save();
+
+    // Redirect to the profile page
+    res.redirect("/profile");
+  } catch (err) {
+    console.error("Error liking/unliking post:", err);
+    res.status(500).send("An error occurred while processing your request.");
+  }
+});
+
+app.post("/post", IsloggedIn, async (req, res) => {
+  const user = await UserModel.findOne({ email: req.user.email });
+  let { content } = req.body;
+  let post = await postModel.create({ user: user._id, content: content });
+
+  user.post.push(post._id);
+  await user.save();
+
+  // Populate the post field before redirecting
+
+  res.redirect("/profile");
+});
 
 app.post("/create", async (req, res) => {
   const { username, name, age, email, password } = req.body;
@@ -86,7 +134,7 @@ app.post("/login", async (req, res) => {
         );
         res.cookie("token", token, { httpOnly: true });
 
-        return res.status(200).send("You can login");
+        return res.status(200).redirect("/profile");
       } else {
         return res.status(400).send("Invalid email or password");
       }
@@ -98,16 +146,39 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-
   res.clearCookie("token");
   res.redirect("/login");
 });
 
-//middleware 
+//edit post
 
-function IsloggedIn (req,res,next){
+app.get("/edit/:id", IsloggedIn, async (req, res) => {
+  const post = await postModel.findById(req.params.id);
+  const user = await UserModel.findOne({ email: req.user.email });
+  res.render("edit", { post, user });
+});
+
+app.post("/edit/:id", IsloggedIn, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const updatedContent = req.body.content;
+
+    // Update the post content
+    await postModel.findByIdAndUpdate(postId, { content: updatedContent });
+
+    // Redirect to profile after successful update
+    res.redirect("/profile");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+//middleware
+
+function IsloggedIn(req, res, next) {
   const token = req.cookies.token;
-  if(!token) return res.send("you need to logged in");
+  if (!token) return res.redirect("/login");
 
   jwt.verify(token, process.env.SECRET, (err, decodedToken) => {
     const data = decodedToken;

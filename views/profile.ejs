@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- navbar -->
+    <div class="max-w-4xl mx-auto py-10">
+      <nav
+        class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600"
+      >
+        <div
+          class="max-w-screen-xl mx-auto p-4 flex flex-wrap items-center justify-between"
+        >
+          <div
+            class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
+          >
+            <a
+              href="/logout"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Logout
+            </a>
+          </div>
+          <div
+            class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+            id="navbar-sticky"
+          >
+            <!-- Add your navigation links here -->
+          </div>
+        </div>
+      </nav>
+
+      <!-- component -->
+      <div
+        class="h-fit bg-gray-200 dark:bg-gray-800 flex flex-wrap items-center justify-center mb-3 rounded-lg"
+      >
+        <div
+          class="container lg:w-full bg-white shadow-lg transform duration-200 easy-in-out rounded-lg"
+        >
+          <div class="h-32 overflow-hidden">
+            <img
+              class="w-full"
+              src="https://images.unsplash.com/photo-1605379399642-870262d3d051?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+              alt=""
+            />
+          </div>
+          <div class="flex justify-center px-5 -mt-12">
+            <img
+              class="h-32 w-32 bg-white p-2 rounded-full"
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+              alt=""
+            />
+          </div>
+          <div class=" ">
+            <div class="text-center px-14">
+              <h2 class="text-gray-800 text-3xl font-bold"><%= user.name %></h2>
+              <h3 class="text-gray-400 text-xl mt-2 hover:text-blue-500">
+                @<%= user.username %>
+              </h3>
+            </div>
+            <hr class="mt-6" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white shadow-md rounded-lg p-6 w-full mb-3">
+        <h1 class="text-2xl font-bold mb-4">Create a Post</h1>
+        <form action="/post" method="POST">
+          <div class="mb-4">
+            <label
+              for="content"
+              class="block text-gray-700 text-sm font-bold mb-2"
+              >Content</label
+            >
+            <textarea
+              id="content"
+              name="content"
+              rows="5"
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline resize-none"
+              placeholder="Write your post here..."
+            ></textarea>
+          </div>
+          <div class="flex items-center justify-between">
+            <button
+              type="submit"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Post
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white shadow-md rounded-lg p-6">
+
+        <h3 class="font-bold" ><%= user.username %>'s Posts : </h3>
+
+        <% user.post.reverse().forEach((post) => { %>
+            <!-- Example of a post start -->
+            <div class="mt-6 border border-gray-300 rounded-lg p-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-700 font-medium">@<%= user.username %></span>
+                    <span class="text-gray-500 text-sm"><%= post.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                </div>
+                <div class="mt-2 text-gray-800">
+                    <%= post.content %>
+                </div>
+                <small class="font-bold" ><%= post.likes.length %></small>
+                <div class="mt-2">
+                    <a href="/like/<%= post._id %>" class=" mr-2 text-white bg-blue-500 hover:bg-blue-700 font-bold py-1 px-3 rounded">
+                        <%= post.likes.indexOf(user._id) ? "Unlike" : "Like" %> 
+                    </a>
+                    <a href="/edit/<%= post._id %>"  class=" text-white bg-gray-500 hover:bg-gray-700 font-bold py-1 px-3 rounded">
+                        Edit
+                    </a>
+                </div>
+            </div>
+            <!-- Example of a post end -->
+        <% }) %>
+        
+
+          <!-- Add more posts here -->
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
