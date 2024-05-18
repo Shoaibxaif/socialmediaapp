@@ -35,7 +35,7 @@ const upload = multer({ storage: storage });
 
 // Connect to the database
 mongoose
-  .connect("mongodb://127.0.0.1:27017/miniproject", {
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -120,7 +120,7 @@ app.post("/create", async (req, res) => {
         process.env.SECRET
       );
       res.cookie("token", token);
-      res.send("successful Registered");
+      res.redirect('/profile');
     });
   });
 });
