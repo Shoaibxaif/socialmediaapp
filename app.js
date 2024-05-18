@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
 dotenv.config();
 const app = express();
-const port = process.env.port;
+const port = process.env.port || 3000 ;
 
 app.set("view engine", "ejs");
 app.use(express.json());
