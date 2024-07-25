@@ -2,8 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const multer  = require('multer')
-const path = require("path");
+
+
 const UserModel = require("./models/user");
 const postModel = require("./models/post");
 const cookieParser = require("cookie-parser");
@@ -15,23 +15,12 @@ const port = process.env.PORT || 3000 ;
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+
 app.use(cookieParser());
 
 
 
-// Configure storage for multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'public/images')); 
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); 
-  }
-});
 
-// Create upload middleware
-const upload = multer({ storage: storage });
 
 // Connect to the database
 mongoose
@@ -192,24 +181,6 @@ app.post("/edit/:id", IsloggedIn, async (req, res) => {
   }
 });
 
-//upload picture
-
-app.get("/upload",(req,res)=>{
-  res.render("upload");
-})
-
-app.post('/upload', IsloggedIn, upload.single ('avatar'),async (req, res) => {
-  try {
-    const user = await UserModel.findOne({ email: req.user.email });
-    const avatar = req.file.filename;
-    user.profilepic = avatar;
-    await user.save();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('An error occurred while uploading the file.');
-  }
-  res.redirect('/profile');
-});
 
 
 //middleware
