@@ -2,16 +2,10 @@ const mongoose = require("mongoose");
 
 // Define the schema
 const PostSchema = new mongoose.Schema({
-  user: [
-    {
-      post: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Post",
-        },
-      ],
-    },
-  ],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 
   date: {
     type: Date,
@@ -21,7 +15,7 @@ const PostSchema = new mongoose.Schema({
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+      ref: "User",
     },
   ],
 });

@@ -46,36 +46,30 @@ app.get("/profile", IsloggedIn, async (req, res) => {
 
 app.get("/like/:id", IsloggedIn, async (req, res) => {
   try {
-    // Find the post by ID
     const post = await postModel.findById(req.params.id).populate("user");
 
     if (!post) {
-      // If post not found, send a 404 response
       return res.status(404).send("Post not found");
     }
 
-    // Check if user already liked the post
     const userIndex = post.likes.indexOf(req.user.userid);
 
     if (userIndex === -1) {
-      // If user has not liked the post, add the like
       post.likes.push(req.user.userid);
     } else {
-      // If user has already liked the post, remove the like
       post.likes.splice(userIndex, 1);
     }
 
-    // Save the updated post
     await post.save();
 
-    // Redirect to the profile page
-    res.redirect("/profile");
+    res.json({ likes: post.likes.length, liked: userIndex === -1 });
   } catch (err) {
     console.error("Error liking/unliking post:", err);
-    res.status(500).send("An error occurred while processing your request.");
+    res.status(500).json({ error: "An error occurred while processing your request." });
   }
 });
 
+//creating post
 app.post("/post", IsloggedIn, async (req, res) => {
   const user = await UserModel.findOne({ email: req.user.email });
   let { content } = req.body;
@@ -88,6 +82,20 @@ app.post("/post", IsloggedIn, async (req, res) => {
 
   res.redirect("/profile");
 });
+
+//render all posts
+app.get("/posts", IsloggedIn, async (req, res) => {
+  try {
+    const posts = await postModel.find().populate("user").populate("likes");
+    res.render("posts", { posts, user: req.user });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    res.status(500).send("An error occurred while fetching posts.");
+  }
+});
+
+
+
 
 app.post("/create", async (req, res) => {
   const { username, name, age, email, password } = req.body;
@@ -197,5 +205,5 @@ function IsloggedIn(req, res, next) {
 }
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port http://localhost:${port}`);
 });
