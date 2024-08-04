@@ -15,21 +15,7 @@
         <div
           class="container lg:w-full bg-white shadow-lg transform duration-200 easy-in-out rounded-lg"
         >
-          <div class="h-32 overflow-hidden">
-            <img
-              class="w-full"
-              src="https://images.unsplash.com/photo-1605379399642-870262d3d051?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
-              alt="Banner image"
-            />
-          </div>
-          <div class="flex justify-center px-5 -mt-12">
-            <img
-              class="h-32 w-32 bg-white p-2 rounded-full"
-              src="/images/<%= user.profilepic %>"
-              alt="Profile image"
-            />
-          </div>
-          <div class="text-center px-14">
+          <div class="text-center px-14 mt-6">
             <h2 class="text-gray-800 text-3xl font-bold"><%= user.name %></h2>
             <h3 class="text-gray-400 text-xl mt-2 hover:text-blue-500">
               @<%= user.username %>
